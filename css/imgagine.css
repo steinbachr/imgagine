@@ -1,0 +1,25 @@
+.test[data-columns]::before {
+  content: '3 .column.size-1of3';
+}
+
+/* These are the classes that are going to be applied: */
+.column { float: left; }
+.size-1of3 { width: 33.333%; }
+
+/* Also, don't forget to add this: */
+[data-columns]::before { display: none; }
+
+.imgur_pic {
+  width: 100%;
+}
+.imgur_pic img {
+  width: 100%;  
+}
+
+.imgur_box_pic {
+  float:left;
+}
+.imgur_box_pic > img {
+  width:300px;
+  height:300px;
+}

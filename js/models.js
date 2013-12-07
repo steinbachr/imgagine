@@ -10,6 +10,9 @@
     });
     
     var ImgurPic = Backbone.Model.extend({
+        resize: function() {
+            
+        }
         
     });
     
@@ -45,23 +48,36 @@
     });
     
     /*****----- VIEWS -----*****/
-    var ListView = Backbone.View.extend({        
+    var GridView = Backbone.View.extend({        
         initialize: function() {
             this.model.on('change', this.render, this);
         },
         
-        picList: "<ul><% _.each(pictures, function(pic) { %> <li><img src=\"<%= pic.get('link') %>\" /></li> <% }); %></ul>",
-        render: function() {
-            debugger;
-            this.$el.html(_.template(this.picList, {pictures: this.model.attributes.pictures.models}));
+        picList: "<% _.each(pictures, function(pic) { %> <div class='imgur_pic'><img src=\'<%= pic.get('link') %>\' /></div> <% }); %>",
+        render: function() {  
+            this.$el.attr({'data-columns': true});
+            this.$el.html(_.template(this.picList, {pictures: this.model.get('pictures').models}));
+            salvattore.register_grid(this.$el.get(0));                              
             return this;
         }
     })
     
+    var BoxView = Backbone.View.extend({
+        initialize: function() {
+            this.model.on('change', this.render, this);
+        },
+
+        picList: "<% _.each(pictures, function(pic) { %> <div class='imgur_box_pic'><img src=\'<%= pic.get('link') %>\' /></div> <% }); %>",
+        render: function() {
+            this.$el.html(_.template(this.picList, {pictures: this.model.get('pictures').models}));
+            return this;
+        }
+    })
     
     $.fn.imgagine = function(options) {
+        this.css('position', 'absolute').css('z-index', '-1');        
         var imgagine = new Imgagine({imgurConnection: new ImgurConnection()});        
-        var view = new ListView({el: this, model: imgagine});
+        var view = new GridView({el: this, model: imgagine});
         
         imgagine.getRandomImages();
     }
