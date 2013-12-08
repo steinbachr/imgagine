@@ -19,7 +19,4 @@
 .imgur_box_pic {
   float:left;
 }
-.imgur_box_pic > img {
-  width:300px;
-  height:300px;
-}
+

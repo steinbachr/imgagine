@@ -10,10 +10,19 @@
     });
     
     var ImgurPic = Backbone.Model.extend({
+        /*
+        for box pics, make them fit as evenly as closely as possible to the row width
+         */
         resize: function() {
+            var PER_ROW = 6,
+                BUFFER = 5;
+            var width = this.get('width'),
+                height = this.get('height'),                
+                docWidth = $(document).width(),
+                newSide = Math.floor(docWidth / PER_ROW) - BUFFER;
             
+            this.set({'width': newSide, 'height': newSide});
         }
-        
     });
     
     var Pictures = Backbone.Collection.extend({
@@ -53,7 +62,7 @@
             this.listenTo(this.model, 'change', this.renderGrid);            
         },
         
-        pics: "<% _.each(pictures, function(pic) { %> <div class=\'<% if (gridView) { %>imgur_pic<% } else { %>imgur_box_pic <% } %>\'><img src=\'<%= pic.get('link') %>\' /></div> <% }); %>",        
+        pics: "<% _.each(pictures, function(pic) { %> <div class=\'<% if (gridView) { %>imgur_pic<% } else { %>imgur_box_pic <% } %>\'><img <% if (!gridView) { %>height=\'<%=pic.get('height')%>\' width=\'<%=pic.get('width')%>\' <% } %>src=\'<%= pic.get('link') %>\' /></div> <% }); %>",        
         renderGrid: function() {  
             this.$el.attr({'data-columns': true});
             this.$el.html(_.template(this.pics, {
@@ -64,6 +73,9 @@
             return this;
         },
         renderBox: function() {
+            this.model.get('pictures').each(function(pic) {
+                pic.resize();                
+            });
             this.$el.html(_.template(this.pics, {
                 pictures: this.model.get('pictures').models,
                 gridView: false
