@@ -48,36 +48,53 @@
     });
     
     /*****----- VIEWS -----*****/
-    var GridView = Backbone.View.extend({        
+    var ImgagineView = Backbone.View.extend({        
         initialize: function() {
-            this.model.on('change', this.render, this);
+            this.listenTo(this.model, 'change', this.renderGrid);            
         },
         
-        picList: "<% _.each(pictures, function(pic) { %> <div class='imgur_pic'><img src=\'<%= pic.get('link') %>\' /></div> <% }); %>",
-        render: function() {  
+        pics: "<% _.each(pictures, function(pic) { %> <div class=\'<% if (gridView) { %>imgur_pic<% } else { %>imgur_box_pic <% } %>\'><img src=\'<%= pic.get('link') %>\' /></div> <% }); %>",        
+        renderGrid: function() {  
             this.$el.attr({'data-columns': true});
-            this.$el.html(_.template(this.picList, {pictures: this.model.get('pictures').models}));
+            this.$el.html(_.template(this.pics, {
+                pictures: this.model.get('pictures').models,
+                gridView: true
+            }));
             salvattore.register_grid(this.$el.get(0));                              
             return this;
-        }
-    })
-    
-    var BoxView = Backbone.View.extend({
-        initialize: function() {
-            this.model.on('change', this.render, this);
         },
-
-        picList: "<% _.each(pictures, function(pic) { %> <div class='imgur_box_pic'><img src=\'<%= pic.get('link') %>\' /></div> <% }); %>",
-        render: function() {
-            this.$el.html(_.template(this.picList, {pictures: this.model.get('pictures').models}));
+        renderBox: function() {
+            this.$el.html(_.template(this.pics, {
+                pictures: this.model.get('pictures').models,
+                gridView: false
+            }));
             return this;
         }
     })
     
+    
     $.fn.imgagine = function(options) {
-        this.css('position', 'absolute').css('z-index', '-1');        
-        var imgagine = new Imgagine({imgurConnection: new ImgurConnection()});        
-        var view = new GridView({el: this, model: imgagine});
+        this.css('position', 'absolute').css('z-index', '-1');
+        
+        var gridViewSelector = options['gridViewSel'],
+            boxViewSelector = options['boxViewSel'],
+            regenerateSelector = options['regenerateSel'];
+                
+        var imgagine = new Imgagine({imgurConnection: new ImgurConnection()});
+        var imgagineView = new ImgagineView({
+            el: this, 
+            model: imgagine
+        });
+        
+        $(gridViewSelector).click(function() {
+            imgagineView.renderGrid();            
+        });
+        $(boxViewSelector).click(function() {
+            imgagineView.renderBox();            
+        });
+        $(regenerateSelector).click(function() {
+            imgagine.getRandomImages();
+        });
         
         imgagine.getRandomImages();
     }
