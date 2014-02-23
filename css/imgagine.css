@@ -7,7 +7,12 @@
 .size-1of3 { width: 33.333%; }
 
 /* Also, don't forget to add this: */
-[data-columns]::before { display: none; }
+[data-columns]::before {
+    position: absolute;
+    right: 9999em;
+    bottom: 9999em;
+    visibility: hidden;
+}
 
 .imgur_pic {
   width: 100%;
